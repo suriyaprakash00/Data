@@ -1,0 +1,125 @@
+ex 1
+
+Dataset=read.csv('Dataset.csv')
+Dataset$Age=ifelse(is.na(Dataset$Age),ave(Dataset$Age, FUN= function(x) mean(x,na.rm=TRUE)),Dataset$Age)
+Dataset$Salary=ifelse(is.na(Dataset$Salary),ave(Dataset$Salary, FUN= function(x) mean(x,na.rm=TRUE)),Dataset$Salary)
+Dataset$Country=factor(Dataset$Country,levels=c('France','Spain','Germany'),labels=c(1,2,3))
+Dataset$Purchased=factor(Dataset$Purchased,levels=c('No','Yes'),labels=c(0,1))
+install.packages('caTools')
+library('caTools')
+set.seed(123)
+split=sample.split(Dataset,SplitRatio = 0.7)
+training_set=subset(Dataset,split==TRUE)
+test_set=subset(Dataset,split==FALSE)
+training_set[,2:3]=scale(training_set[,2:3])
+test_set[,2:3]=scale(test_set[,2:3])
+print(training_set)
+print(test_set)
+
+ex2
+
+data("airquality")
+#Barplot
+barplot(airquality$Ozone,
+        main ='Ozone concenteration in air',
+        xlab ='Ozone levels',horiz = TRUE)
+barplot(airquality$Ozone,
+        main='Ozone concenteration in air',
+        xlab='Ozone levels',horiz = FALSE)
+#Histogram
+hist(airquality$Temp, main = "La Guardia Airport's\ Maximum Temperature(Daily)",
+     xlab = "Temperature(Fahrenheit)",
+     xlim = c(50, 125),
+     col = "blue", freq = TRUE)
+#Boxplot
+boxplot(airquality$Wind,main = "Average wind speed\ at La Guardia Airport",
+        xlab = "miles per hour",ylab = "wind",
+        col = "orange",border = "brown",
+        horizontal = TRUE,notch = TRUE)
+boxplot(airquality[,0:4],
+        main = 'box plots for air parameters')
+#ScatterPlot
+plot(airquality$Ozone,airquality$month,
+     main = "scatterplot example",
+     xlab = "Ozone concentration in parts per billion",
+     ylab = "month of observation",pch = 10)
+#Heatmap
+Ozone_miss = which(is.na(airquality$Ozone))
+airquality$Ozone[Ozone_miss] = mean(airquality$Ozone,na.rm = TRUE)
+Solar.R_miss = which(is.na(airquality$Solar.R))
+airquality$Solar.R[Solar.R_miss] = mean(airquality$Solar.R,na.rm = TRUE)
+data<-matrix(rnorm(50,0,5),nrow=5,ncol=5)
+colnames(data)<-paste0("col",1:5)
+rownames(data)<-paste0("row",1:5)
+heatmap(data)
+
+ex 3
+
+df = trees[2:3]
+df
+result = cor(df$Height, df$Volume, method = "pearson")
+cat("Pearson correlation coefficient is:", result)
+install.packages('caTools')
+library(caTools)
+split = sample.split(df$Height, SplitRatio = 0.7)
+trainingset = subset(df, split == TRUE)
+testset = subset(df, split == FALSE)
+lm.r= lm(formula = Height ~ Volume,data = trainingset)
+coef(lm.r)
+ypred = predict(lm.r, newdata = testset)
+summary(lm.r)
+
+ex 4
+
+install.packages("party")
+library(party)
+df = infert
+View(df)
+ind <-sample(2,nrow(df),replace = TRUE,prob = c(0.7,0.30))
+train.data <- df[ind==1,]
+test.data <- df[ind==2,]
+myf <- education~age+parity+induced+case
+infert_ctree <- ctree(myf , data = train.data)
+table(predict(infert_ctree) , train.data$education)
+plot(infert_ctree)
+testpred<-predict(infert_ctree,newdata = test.data)
+table(testpred,test.data$education)
+
+ex 5
+
+install.packages("stats ")
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("ggfortify")
+library(stats)
+library(dplyr)
+library(ggplot2)
+library(ggfortify)
+wssplot<- function(data, nc=15, seed=1234){
+  wss<- (nrow(data)-1)*sum(apply(data,2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type="b", xlab="Number of Clusters",
+       ylab="Within groups sum of squares")
+  wss
+}
+View(iris)
+mydata=select(iris,c(1,2,3,4))
+wssplot(mydata)
+KM=kmeans(mydata,2)
+autoplot(KM,mydata,frame=TRUE)
+KM$centers
+
+ex 6
+
+install.packages("arules")
+install.packages("arulesViz")
+library(arules)
+library(arulesViz)
+qq=as.matrix(Faceplate)
+qq=as(qq,"transactions")
+rules=apriori(qq,parameter = list(supp=0.2,conf=0.5,minlen=2))
+rules=sort(rules,by="lift")
+inspect(rules)
+plot(rules, method = "graph", measure = "confidence", shading = "lift")
